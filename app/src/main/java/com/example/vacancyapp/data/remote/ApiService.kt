@@ -21,6 +21,11 @@ class ApiService @Inject constructor(private val client: HttpClient) {
         client.post("/auth/logout") { bearerAuth(token) }
     }
 
+    suspend fun refreshToken(refreshToken: String): AuthResponse =
+        client.post("/auth/refresh") {
+            bearerAuth(refreshToken)
+        }.body()
+
     suspend fun getVacancies(token: String): List<VacancyDto> =
         client.get("/vacancies") { bearerAuth(token) }.body()
 

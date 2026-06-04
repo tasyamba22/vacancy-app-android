@@ -31,14 +31,15 @@ class AuthViewModel @Inject constructor(
             _uiState.value = AuthUiState(isLoading = true)
             try {
                 val result = authRepository.login(email, password)
-                tokenManager.saveToken(
-                    token = result.token,
+                tokenManager.saveTokens(
+                    accessToken = result.token,
+                    refreshToken = result.refreshToken,
                     role = result.role,
                     userId = result.userId,
                     email = email
                 )
                 _uiState.value = AuthUiState(isSuccess = true)
-            } catch (e: io.ktor.client.plugins.ClientRequestException) {
+            } catch (e: ClientRequestException) {
                 val errorMessage = when (e.response.status.value) {
                     401 -> "Неверный email или пароль"
                     403 -> "Ваш аккаунт заблокирован"
@@ -56,8 +57,9 @@ class AuthViewModel @Inject constructor(
             _uiState.value = AuthUiState(isLoading = true)
             try {
                 val result = authRepository.register(email, password)
-                tokenManager.saveToken(
-                    token = result.token,
+                tokenManager.saveTokens(
+                    accessToken = result.token,
+                    refreshToken = result.refreshToken,
                     role = result.role,
                     userId = result.userId,
                     email = email
@@ -70,8 +72,6 @@ class AuthViewModel @Inject constructor(
                     else -> "Ошибка регистрации"
                 }
                 _uiState.value = AuthUiState(error = errorMessage)
-            } catch (e: IllegalArgumentException) {
-                _uiState.value = AuthUiState(error = e.message ?: "Ошибка")
             } catch (e: Exception) {
                 _uiState.value = AuthUiState(error = "Ошибка регистрации")
             }
