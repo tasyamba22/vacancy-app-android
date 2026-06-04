@@ -18,7 +18,8 @@ data class ProfileUiState(
     val role: String = "",
     val isLoading: Boolean = false,
     val isSaved: Boolean = false,
-    val error: String? = null
+    val error: String? = null,
+    val isOffline: Boolean = false
 )
 
 @HiltViewModel
@@ -34,7 +35,7 @@ class ProfileViewModel @Inject constructor(
     init { loadProfile() }
 
     private fun loadProfile() = viewModelScope.launch {
-        _uiState.update { it.copy(isLoading = true, error = null) }
+        _uiState.update { it.copy(isLoading = true, error = null, isOffline = false) }
         try {
             val token = tokenManager.token.first() ?: return@launch
             val email = tokenManager.email.first() ?: ""
@@ -52,12 +53,14 @@ class ProfileViewModel @Inject constructor(
                     )
                 }
             } catch (_: Exception) {
-                // Fallback на данные из токена
+
                 _uiState.update {
                     it.copy(
                         email = email,
                         role = role,
-                        isLoading = false
+                        isLoading = false,
+                        isOffline = true,
+                        error = "Нет соединения. Показаны сохранённые данные"
                     )
                 }
             }
@@ -106,7 +109,7 @@ class ProfileViewModel @Inject constructor(
             val token = tokenManager.token.first()
             if (token != null) authRepository.logout(token)
         } catch (_: Exception) {}
-        tokenManager.clearToken()
+        tokenManager.clearTokens()
         onDone()
     }
 }

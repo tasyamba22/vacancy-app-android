@@ -39,7 +39,7 @@ class ResumeViewModel @Inject constructor(
             val resume = resumeRepository.getMyResume(token)
             _uiState.update { it.copy(resume = resume, isLoading = false, fullName = resume.fullName, phone = resume.phone ?: "", skills = resume.skills ?: "", experience = resume.experience ?: "", education = resume.education ?: "") }
         } catch (_: Exception) {
-            _uiState.update { it.copy(isLoading = false, resume = null) }
+            _uiState.update { it.copy(isLoading = false, resume = null, error = "Нет соединения с сервером. Резюме недоступно") }
         }
     }
 

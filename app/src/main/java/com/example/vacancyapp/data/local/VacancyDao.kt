@@ -8,6 +8,9 @@ interface VacancyDao {
     @Query("SELECT * FROM vacancies ORDER BY createdAt DESC")
     fun getAllVacancies(): Flow<List<VacancyEntity>>
 
+    @Query("SELECT COUNT(*) FROM vacancies")
+    suspend fun getAllVacanciesCount(): Int
+
     @Query("SELECT * FROM vacancies WHERE title LIKE '%' || :query || '%' OR company LIKE '%' || :query || '%' OR description LIKE '%' || :query || '%'")
     fun searchVacancies(query: String): Flow<List<VacancyEntity>>
 

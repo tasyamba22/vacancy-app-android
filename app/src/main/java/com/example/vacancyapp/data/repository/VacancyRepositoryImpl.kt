@@ -1,14 +1,17 @@
 package com.example.vacancyapp.data.repository
 
+import android.util.Log
 import com.example.vacancyapp.data.local.VacancyDao
 import com.example.vacancyapp.data.remote.ApiService
 import com.example.vacancyapp.data.remote.dto.CreateVacancyRequest
 import com.example.vacancyapp.data.remote.dto.UpdateVacancyRequest
 import com.example.vacancyapp.domain.models.Vacancy
 import com.example.vacancyapp.domain.repository.VacancyRepository
+import com.example.vacancyapp.utils.TokenManager
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
+import io.ktor.client.plugins.ClientRequestException
 
 private fun com.example.vacancyapp.data.local.VacancyEntity.toDomain() =
     com.example.vacancyapp.domain.models.Vacancy(
@@ -51,7 +54,8 @@ private fun com.example.vacancyapp.data.remote.dto.VacancyDto.toDomain() =
 
 class VacancyRepositoryImpl @Inject constructor(
     private val api: ApiService,
-    private val dao: VacancyDao
+    private val dao: VacancyDao,
+    private val tokenManager: TokenManager
 ) : VacancyRepository {
 
     override fun getVacancies(): Flow<List<Vacancy>> =
@@ -67,9 +71,40 @@ class VacancyRepositoryImpl @Inject constructor(
         dao.getFavorites().map { list -> list.map { it.toDomain() } }
 
     override suspend fun syncVacancies(token: String) {
-        val remote = api.getVacancies(token)
-        dao.deleteAll()
-        dao.upsertAll(remote.map { it.toEntity() })
+        try {
+            val remote = api.getVacancies(token)
+            dao.deleteAll()
+            dao.upsertAll(remote.map { it.toEntity() })
+            Log.d("VacancyRepo", "Успешно загружено ${remote.size} вакансий с сервера")
+        } catch (e: ClientRequestException) {
+            if (e.response.status.value == 401) {
+                val refreshToken = tokenManager.getRefreshToken()
+                if (refreshToken != null) {
+                    try {
+                        val newAuth = api.refreshToken(refreshToken)
+                        tokenManager.saveTokens(
+                            accessToken = newAuth.token,
+                            refreshToken = newAuth.refreshToken,
+                            role = newAuth.role,
+                            userId = newAuth.userId,
+                            email = ""
+                        )
+                        val newToken = newAuth.token
+                        val remote = api.getVacancies(newToken)
+                        dao.deleteAll()
+                        dao.upsertAll(remote.map { it.toEntity() })
+                        return
+                    } catch (refreshEx: Exception) {
+                        Log.e("VacancyRepo", "Refresh failed")
+                        tokenManager.clearTokens()
+                        throw Exception("Сессия истекла")
+                    }
+                }
+            }
+            Log.e("VacancyRepo", "Sync failed, using cache: ${e.message}")
+        } catch (e: Exception) {
+            Log.e("VacancyRepo", "Sync failed, using cache: ${e.message}")
+        }
     }
 
     override suspend fun syncFavorites(token: String) {

@@ -9,6 +9,7 @@ import com.example.vacancyapp.utils.TokenManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -143,10 +144,11 @@ class MainViewModel @Inject constructor(
 
             vacancyRepository.syncVacancies(token)
             vacancyRepository.syncFavorites(token)
+            _error.value = null
 
         } catch (e: Exception) {
 
-            _error.value = e.message ?: "Ошибка загрузки"
+            _error.value = null
 
         } finally {
 
@@ -157,29 +159,22 @@ class MainViewModel @Inject constructor(
     fun loadMyVacancies() = viewModelScope.launch {
 
         _isLoading.value = true
+        _error.value = null
 
         try {
 
-            val token = tokenManager.token.first()
-
-            if (token == null) {
-
-                _myVacancies.value = emptyList()
-                return@launch
-            }
-
+            val token = tokenManager.token.first() ?: return@launch
             val vacancies = vacancyRepository.getMyVacancies(token)
-
             _myVacancies.value = vacancies
 
         } catch (e: Exception) {
 
-            _error.value = e.message
             _myVacancies.value = emptyList()
 
         } finally {
 
             _isLoading.value = false
+
         }
     }
 
@@ -212,6 +207,9 @@ class MainViewModel @Inject constructor(
     }
 
     init {
-        refresh()
+        viewModelScope.launch {
+            delay(400)
+            refresh()
+        }
     }
 }
