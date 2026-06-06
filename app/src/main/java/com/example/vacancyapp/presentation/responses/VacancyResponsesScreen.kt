@@ -50,11 +50,18 @@ class VacancyResponsesViewModel @Inject constructor(
     fun updateStatus(id: Int, status: String) = viewModelScope.launch {
         try {
             val token = tokenManager.token.first() ?: return@launch
-            val updated = responseRepository.updateResponseStatus(token, id, status)
-            _responses.update { list ->
-                list.map { if (it.id == id) updated else it }
+            val updatedResponse = responseRepository.updateResponseStatus(token, id, status)
+            _responses.update { currentList ->
+                currentList.map { response ->
+                    if (response.id == id) {
+                        updatedResponse
+                    } else {
+                        response
+                    }
+                }
             }
-        } catch (_: Exception) {}
+        } catch (_: Exception) {
+        }
     }
 }
 
