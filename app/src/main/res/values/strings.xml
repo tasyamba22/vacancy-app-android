@@ -1,3 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">VacancyApp</string>
+
+    <string name="login_title">Вход</string>
+    <string name="login_button">Войти</string>
+    <string name="login_no_account">Нет аккаунта? Зарегистрироваться</string>
+    <string name="login_error_wrong_credentials">Неверный email или пароль</string>
+    <string name="login_error_blocked">Ваш аккаунт заблокирован</string>
+    <string name="login_error_generic">Ошибка входа</string>
+
+    <string name="register_title">Регистрация</string>
+    <string name="register_button">Зарегистрироваться</string>
+    <string name="register_has_account">Уже есть аккаунт? Войти</string>
+    <string name="register_error_passwords_mismatch">Пароли не совпадают</string>
+    <string name="register_error_email_exists">Пользователь с таким email уже существует</string>
+    <string name="register_error_password_short">Пароль должен быть не менее 6 символов</string>
+    <string name="register_error_generic">Ошибка регистрации</string>
+
+    <string name="field_email">Email</string>
+    <string name="field_password">Пароль</string>
+    <string name="field_confirm_password">Подтвердите пароль</string>
+
+    <string name="addedit_title_edit">Редактировать</string>
+    <string name="addedit_title_new">Новая вакансия</string>
+    <string name="addedit_field_title">Название *</string>
+    <string name="addedit_field_company">Компания *</string>
+    <string name="addedit_field_salary">Зарплата</string>
+    <string name="addedit_field_location">Локация</string>
+    <string name="addedit_field_description">Описание</string>
+    <string name="addedit_button_save">Сохранить</string>
+    <string name="addedit_error_required_fields">Название и компания обязательны</string>
+
+    <string name="detail_title">Вакансия</string>
+    <string name="detail_not_found">Вакансия не найдена</string>
+    <string name="detail_salary_label">Зарплата</string>
+    <string name="detail_salary_not_set">Не указана</string>
+    <string name="detail_location_label">Локация</string>
+    <string name="detail_location_not_set">Не указана</string>
+    <string name="detail_description_label">Описание</string>
+    <string name="detail_description_empty">Описание отсутствует</string>
+    <string name="detail_button_responses">Посмотреть отклики</string>
+    <string name="detail_button_create_resume">Создайте резюме для отклика</string>
+    <string name="detail_button_respond">Откликнуться на вакансию</string>
+    <string name="detail_status_accepted">Отклик принят</string>
+    <string name="detail_status_rejected">Отклик отклонён</string>
+    <string name="detail_status_pending">Отклик отправлен (на рассмотрении)</string>
+    <string name="detail_cd_back">Назад</string>
+    <string name="detail_cd_edit">Редактировать</string>
+    <string name="detail_cd_delete">Удалить</string>
+
+    <string name="respond_dialog_title">Откликнуться на вакансию</string>
+    <string name="respond_dialog_cover_letter_label">Сопроводительное письмо (необязательно):</string>
+    <string name="respond_dialog_cover_letter_hint">Расскажите, почему вы подходите…</string>
+    <string name="respond_dialog_confirm">Отправить отклик</string>
+    <string name="respond_dialog_cancel">Отмена</string>
+
+    <string name="delete_dialog_title">Удаление вакансии</string>
+    <string name="delete_dialog_message">Вы действительно хотите удалить вакансию?</string>
+    <string name="delete_dialog_confirm">Удалить</string>
+    <string name="delete_dialog_cancel">Отмена</string>
+
+    <string name="favorites_title">Избранное</string>
+    <string name="favorites_empty_title">Нет избранных вакансий</string>
+    <string name="favorites_empty_subtitle">Добавляйте понравившиеся вакансии сюда</string>
+    <string name="favorites_cd_back">Назад</string>
+
+    <string name="resume_title">Моё резюме</string>
+    <string name="resume_field_full_name">ФИО *</string>
+    <string name="resume_field_phone">Телефон</string>
+    <string name="resume_field_skills">Навыки</string>
+    <string name="resume_field_experience">Опыт работы</string>
+    <string name="resume_field_education">Образование</string>
+    <string name="resume_button_create">Создать резюме</string>
+    <string name="resume_button_save">Сохранить изменения</string>
+    <string name="resume_button_delete">Удалить резюме</string>
+    <string name="resume_error_full_name_required">ФИО обязательно</string>
+
+    <string name="resume_view_title">Резюме соискателя</string>
+    <string name="resume_view_not_found">Резюме не найдено</string>
+    <string name="resume_view_section_skills">Навыки</string>
+    <string name="resume_view_section_experience">Опыт работы</string>
+    <string name="resume_view_section_education">Образование</string>
+
+    <string name="vacancy_responses_title">Отклики на вакансию</string>
+    <string name="vacancy_responses_empty">Откликов пока нет</string>
+    <string name="vacancy_responses_status_accepted">Принят</string>
+    <string name="vacancy_responses_status_rejected">Отклонён</string>
+    <string name="vacancy_responses_status_pending">Ожидает рассмотрения</string>
+    <string name="vacancy_responses_cover_letter_label">Сопроводительное письмо:</string>
+    <string name="vacancy_responses_button_view_resume">Посмотреть резюме</string>
+    <string name="vacancy_responses_button_accept">Принять</string>
+    <string name="vacancy_responses_button_reject">Отклонить</string>
+    <string name="vacancy_responses_applicant_fallback">Соискатель #%1$d</string>
+
+    <string name="my_responses_title">Мои отклики</string>
+    <string name="my_responses_empty_title">Пока нет откликов</string>
+    <string name="my_responses_empty_subtitle">Ваши отклики на вакансии будут здесь</string>
+    <string name="my_responses_status_accepted">Принят</string>
+    <string name="my_responses_status_rejected">Отклонён</string>
+    <string name="my_responses_status_pending">На рассмотрении</string>
+    <string name="my_responses_cover_letter_label">Сопроводительное письмо:</string>
+    <string name="my_responses_vacancy_fallback">Вакансия #%1$d</string>
+
+    <string name="profile_title">Профиль</string>
+    <string name="profile_field_email">Email</string>
+    <string name="profile_role_admin">Администратор</string>
+    <string name="profile_role_user">Пользователь</string>
+    <string name="profile_role_prefix">Роль: </string>
+    <string name="profile_field_first_name">Имя</string>
+    <string name="profile_field_last_name">Фамилия</string>
+    <string name="profile_button_save">Сохранить изменения</string>
+    <string name="profile_button_logout">Выйти из аккаунта</string>
+    <string name="profile_error_save">Ошибка сохранения: %1$s</string>
+    <string name="profile_offline_message">Нет соединения. Показаны сохранённые данные</string>
+    <string name="profile_cd_back">Назад</string>
+
+    <string name="admin_title">Админ-панель</string>
+    <string name="admin_stats_title">Статистика</string>
+    <string name="admin_stats_users">Пользователей: %1$d</string>
+    <string name="admin_stats_vacancies">Вакансий: %1$d</string>
+    <string name="admin_users_section">Пользователи</string>
+    <string name="admin_user_role_prefix">Роль: </string>
+    <string name="admin_user_active">Активен</string>
+    <string name="admin_user_blocked">Заблокирован</string>
+    <string name="admin_button_unblock">Разблокировать</string>
+    <string name="admin_button_block">Блокировать</string>
+    <string name="admin_button_make_user">Сделать USER</string>
+    <string name="admin_button_make_admin">Сделать ADMIN</string>
+
+    <string name="common_back">Назад</string>
+    <string name="common_cancel">Отмена</string>
+    <string name="common_loading">Загрузка…</string>
+    <string name="common_no_connection">Нет соединения</string>
+
+    <string name="main_title_vacancies">Вакансии</string>
+    <string name="main_title_my_vacancies">Мои вакансии</string>
+    <string name="main_profile_cd">Профиль</string>
+    <string name="main_add_cd">Добавить</string>
+    <string name="main_tab_all">Все</string>
+    <string name="main_tab_favorites">Избранное</string>
+    <string name="main_tab_my">Мои</string>
+    <string name="main_tab_resume">Резюме</string>
+    <string name="main_tab_responses">Отклики</string>
+    <string name="main_tab_admin">Админ</string>
+    <string name="main_error_load">Ошибка загрузки</string>
+    <string name="main_refresh">Обновить</string>
+    <string name="main_empty">Ничего не найдено</string>
+
+    <string name="search_placeholder">Поиск вакансий...</string>
+    <string name="search_clear">Очистить</string>
+    <string name="search_filters">Фильтры</string>
+    <string name="search_history_title">История поиска</string>
+    <string name="search_history_clear">Очистить</string>
+    <string name="filter_city_hint">Город</string>
+    <string name="filter_company_hint">Компания</string>
+    <string name="filter_salary_from">Зарплата от</string>
+    <string name="filter_salary_to">до</string>
+    <string name="filter_apply">Применить фильтры</string>
+
+    <string name="vacancy_card_favorite_cd">Избранное</string>
+    <string name="vacancy_card_unfavorite_cd">Удалить из избранного</string>
 </resources>
