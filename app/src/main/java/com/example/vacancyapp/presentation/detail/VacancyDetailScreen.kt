@@ -9,10 +9,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.vacancyapp.R
 import com.example.vacancyapp.utils.ResponseStatus
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -35,16 +37,16 @@ fun VacancyDetailScreen(
     if (showResponseDialog) {
         AlertDialog(
             onDismissRequest = { showResponseDialog = false },
-            title = { Text("Откликнуться на вакансию") },
+            title = { Text(stringResource(R.string.respond_dialog_title)) },
             text = {
                 Column {
-                    Text("Сопроводительное письмо (необязательно):")
+                    Text(stringResource(R.string.respond_dialog_cover_letter_label))
                     Spacer(Modifier.height(8.dp))
                     OutlinedTextField(
                         value = coverLetter,
                         onValueChange = { coverLetter = it },
                         modifier = Modifier.fillMaxWidth().height(140.dp),
-                        placeholder = { Text("Расскажите, почему вы подходите...") }
+                        placeholder = { Text(stringResource(R.string.respond_dialog_cover_letter_hint)) }
                     )
                 }
             },
@@ -52,10 +54,12 @@ fun VacancyDetailScreen(
                 Button(onClick = {
                     viewModel.respond(vacancyId, coverLetter.ifBlank { null })
                     showResponseDialog = false
-                }) { Text("Отправить отклик") }
+                }) { Text(stringResource(R.string.respond_dialog_confirm)) }
             },
             dismissButton = {
-                TextButton(onClick = { showResponseDialog = false }) { Text("Отмена") }
+                TextButton(onClick = { showResponseDialog = false }) {
+                    Text(stringResource(R.string.respond_dialog_cancel))
+                }
             }
         )
     }
@@ -63,25 +67,17 @@ fun VacancyDetailScreen(
     if (showDeleteDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
-            title = { Text("Удаление вакансии") },
-            text = { Text("Вы действительно хотите удалить вакансию?") },
+            title = { Text(stringResource(R.string.delete_dialog_title)) },
+            text = { Text(stringResource(R.string.delete_dialog_message)) },
             confirmButton = {
-                Button(
-                    onClick = {
-                        viewModel.deleteVacancy(vacancyId) {
-                            onBack()
-                        }
-                        showDeleteDialog = false
-                    }
-                ) {
-                    Text("Удалить")
-                }
+                Button(onClick = {
+                    viewModel.deleteVacancy(vacancyId) { onBack() }
+                    showDeleteDialog = false
+                }) { Text(stringResource(R.string.delete_dialog_confirm)) }
             },
             dismissButton = {
-                TextButton(
-                    onClick = { showDeleteDialog = false }
-                ) {
-                    Text("Отмена")
+                TextButton(onClick = { showDeleteDialog = false }) {
+                    Text(stringResource(R.string.delete_dialog_cancel))
                 }
             }
         )
@@ -90,16 +86,19 @@ fun VacancyDetailScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Вакансия") },
-                navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.Default.ArrowBack, "Назад") } },
+                title = { Text(stringResource(R.string.detail_title)) },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(Icons.Default.ArrowBack, stringResource(R.string.detail_cd_back))
+                    }
+                },
                 actions = {
                     if (uiState.isOwner) {
                         IconButton(onClick = { onEdit(vacancyId) }) {
-                            Icon(Icons.Default.Edit, "Редактировать")
+                            Icon(Icons.Default.Edit, stringResource(R.string.detail_cd_edit))
                         }
-
                         IconButton(onClick = { showDeleteDialog = true }) {
-                            Icon(Icons.Default.Delete, "Удалить")
+                            Icon(Icons.Default.Delete, stringResource(R.string.detail_cd_delete))
                         }
                     }
                 }
@@ -109,82 +108,112 @@ fun VacancyDetailScreen(
         Box(Modifier.fillMaxSize().padding(padding)) {
             when {
                 uiState.isLoading -> CircularProgressIndicator(Modifier.align(Alignment.Center))
-                uiState.vacancy == null -> Text("Вакансия не найдена", Modifier.align(Alignment.Center))
+                uiState.vacancy == null -> Text(
+                    stringResource(R.string.detail_not_found),
+                    Modifier.align(Alignment.Center)
+                )
                 else -> {
                     val vacancy = uiState.vacancy!!
-
                     Column(
                         Modifier
                             .fillMaxSize()
                             .verticalScroll(rememberScrollState())
                             .padding(16.dp)
                     ) {
-                        Text(vacancy.title, style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold))
+                        Text(
+                            vacancy.title,
+                            style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold)
+                        )
                         Spacer(Modifier.height(8.dp))
-                        Text(vacancy.company, style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.primary)
-
+                        Text(
+                            vacancy.company,
+                            style = MaterialTheme.typography.titleLarge,
+                            color = MaterialTheme.colorScheme.primary
+                        )
                         Spacer(Modifier.height(16.dp))
 
                         Card(
                             modifier = Modifier.fillMaxWidth(),
-                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.6f))
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.6f)
+                            )
                         ) {
                             Row(
                                 modifier = Modifier.fillMaxWidth().padding(20.dp),
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
                                 Column {
-                                    Text("Зарплата", style = MaterialTheme.typography.labelMedium)
+                                    Text(stringResource(R.string.detail_salary_label), style = MaterialTheme.typography.labelMedium)
                                     Text(
-                                        vacancy.salary ?: "Не указана",
+                                        vacancy.salary ?: stringResource(R.string.detail_salary_not_set),
                                         style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.SemiBold),
                                         color = MaterialTheme.colorScheme.primary
                                     )
                                 }
                                 Column(horizontalAlignment = Alignment.End) {
-                                    Text("Локация", style = MaterialTheme.typography.labelMedium)
-                                    Text(vacancy.location ?: "Не указана", style = MaterialTheme.typography.titleMedium)
+                                    Text(stringResource(R.string.detail_location_label), style = MaterialTheme.typography.labelMedium)
+                                    Text(
+                                        vacancy.location ?: stringResource(R.string.detail_location_not_set),
+                                        style = MaterialTheme.typography.titleMedium
+                                    )
                                 }
                             }
                         }
 
                         Spacer(Modifier.height(24.dp))
-
-                        Text("Описание", style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold))
+                        Text(
+                            stringResource(R.string.detail_description_label),
+                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold)
+                        )
                         Spacer(Modifier.height(8.dp))
-                        Text(vacancy.description ?: "Описание отсутствует", style = MaterialTheme.typography.bodyLarge, lineHeight = 22.sp)
-
+                        Text(
+                            vacancy.description ?: stringResource(R.string.detail_description_empty),
+                            style = MaterialTheme.typography.bodyLarge,
+                            lineHeight = 22.sp
+                        )
                         Spacer(Modifier.height(32.dp))
 
                         when {
                             uiState.isOwner -> {
-                                Button(onClick = { onNavigateToResponses(vacancyId) }, modifier = Modifier.fillMaxWidth()) {
+                                Button(
+                                    onClick = { onNavigateToResponses(vacancyId) },
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
                                     Icon(Icons.Default.People, null)
                                     Spacer(Modifier.width(8.dp))
-                                    Text("Посмотреть отклики")
+                                    Text(stringResource(R.string.detail_button_responses))
                                 }
                             }
                             uiState.myResume == null -> {
-                                OutlinedButton(onClick = onNavigateToResume, modifier = Modifier.fillMaxWidth()) {
-                                    Text("Создайте резюме для отклика")
+                                OutlinedButton(
+                                    onClick = onNavigateToResume,
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Text(stringResource(R.string.detail_button_create_resume))
                                 }
                             }
                             uiState.myResponse != null -> {
                                 val status = uiState.myResponse!!.status
                                 val (text, color) = when (status) {
-                                    ResponseStatus.ACCEPTED -> "Отклик принят" to MaterialTheme.colorScheme.primary
-                                    ResponseStatus.REJECTED -> "Отклик отклонён" to MaterialTheme.colorScheme.error
-                                    else -> "Отклик отправлен (на рассмотрении)" to MaterialTheme.colorScheme.secondary
+                                    ResponseStatus.ACCEPTED -> stringResource(R.string.detail_status_accepted) to MaterialTheme.colorScheme.primary
+                                    ResponseStatus.REJECTED -> stringResource(R.string.detail_status_rejected) to MaterialTheme.colorScheme.error
+                                    else -> stringResource(R.string.detail_status_pending) to MaterialTheme.colorScheme.secondary
                                 }
-                                Card(Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = color.copy(alpha = 0.1f))) {
+                                Card(
+                                    Modifier.fillMaxWidth(),
+                                    colors = CardDefaults.cardColors(containerColor = color.copy(alpha = 0.1f))
+                                ) {
                                     Text(text, Modifier.padding(16.dp), color = color, style = MaterialTheme.typography.titleMedium)
                                 }
                             }
                             else -> {
-                                Button(onClick = { showResponseDialog = true }, modifier = Modifier.fillMaxWidth()) {
+                                Button(
+                                    onClick = { showResponseDialog = true },
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
                                     Icon(Icons.Default.Send, null)
                                     Spacer(Modifier.width(8.dp))
-                                    Text("Откликнуться на вакансию")
+                                    Text(stringResource(R.string.detail_button_respond))
                                 }
                             }
                         }

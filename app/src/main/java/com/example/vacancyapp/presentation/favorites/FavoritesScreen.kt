@@ -10,8 +10,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.vacancyapp.R
 import com.example.vacancyapp.presentation.main.VacancyCard
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -26,10 +28,10 @@ fun FavoritesScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Избранное") },
+                title = { Text(stringResource(R.string.favorites_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, "Назад")
+                        Icon(Icons.Default.ArrowBack, stringResource(R.string.favorites_cd_back))
                     }
                 }
             )
@@ -48,9 +50,9 @@ fun FavoritesScreen(
                         tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                     )
                     Spacer(Modifier.height(16.dp))
-                    Text("Нет избранных вакансий", style = MaterialTheme.typography.titleLarge)
+                    Text(stringResource(R.string.favorites_empty_title), style = MaterialTheme.typography.titleLarge)
                     Text(
-                        "Добавляйте понравившиеся вакансии сюда",
+                        stringResource(R.string.favorites_empty_subtitle),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )

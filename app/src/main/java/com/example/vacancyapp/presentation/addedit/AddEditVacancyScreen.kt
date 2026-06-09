@@ -8,8 +8,10 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.vacancyapp.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -27,20 +29,55 @@ fun AddEditVacancyScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(if (vacancyId != null) "Редактировать" else "Новая вакансия") },
-                navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.Default.ArrowBack, null) } }
+                title = {
+                    Text(
+                        if (vacancyId != null) stringResource(R.string.addedit_title_edit)
+                        else stringResource(R.string.addedit_title_new)
+                    )
+                },
+                navigationIcon = {
+                    IconButton(onClick = onBack) { Icon(Icons.Default.ArrowBack, null) }
+                }
             )
         }
     ) { padding ->
         Column(
-            Modifier.fillMaxSize().padding(padding).padding(16.dp).verticalScroll(rememberScrollState()),
+            Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .padding(16.dp)
+                .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            OutlinedTextField(uiState.title, viewModel::onTitleChange, Modifier.fillMaxWidth(), label = { Text("Название *") }, singleLine = true)
-            OutlinedTextField(uiState.company, viewModel::onCompanyChange, Modifier.fillMaxWidth(), label = { Text("Компания *") }, singleLine = true)
-            OutlinedTextField(uiState.salary, viewModel::onSalaryChange, Modifier.fillMaxWidth(), label = { Text("Зарплата") }, singleLine = true)
-            OutlinedTextField(uiState.location, viewModel::onLocationChange, Modifier.fillMaxWidth(), label = { Text("Локация") }, singleLine = true)
-            OutlinedTextField(uiState.description, viewModel::onDescriptionChange, Modifier.fillMaxWidth().height(150.dp), label = { Text("Описание") })
+            OutlinedTextField(
+                uiState.title, viewModel::onTitleChange,
+                Modifier.fillMaxWidth(),
+                label = { Text(stringResource(R.string.addedit_field_title)) },
+                singleLine = true
+            )
+            OutlinedTextField(
+                uiState.company, viewModel::onCompanyChange,
+                Modifier.fillMaxWidth(),
+                label = { Text(stringResource(R.string.addedit_field_company)) },
+                singleLine = true
+            )
+            OutlinedTextField(
+                uiState.salary, viewModel::onSalaryChange,
+                Modifier.fillMaxWidth(),
+                label = { Text(stringResource(R.string.addedit_field_salary)) },
+                singleLine = true
+            )
+            OutlinedTextField(
+                uiState.location, viewModel::onLocationChange,
+                Modifier.fillMaxWidth(),
+                label = { Text(stringResource(R.string.addedit_field_location)) },
+                singleLine = true
+            )
+            OutlinedTextField(
+                uiState.description, viewModel::onDescriptionChange,
+                Modifier.fillMaxWidth().height(150.dp),
+                label = { Text(stringResource(R.string.addedit_field_description)) }
+            )
 
             uiState.error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
 
@@ -50,7 +87,7 @@ fun AddEditVacancyScreen(
                 enabled = !uiState.isLoading
             ) {
                 if (uiState.isLoading) CircularProgressIndicator(Modifier.size(20.dp))
-                else Text("Сохранить")
+                else Text(stringResource(R.string.addedit_button_save))
             }
         }
     }

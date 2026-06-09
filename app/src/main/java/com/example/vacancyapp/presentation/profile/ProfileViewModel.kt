@@ -1,7 +1,9 @@
 package com.example.vacancyapp.presentation.profile
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.vacancyapp.R
 import com.example.vacancyapp.data.remote.ApiService
 import com.example.vacancyapp.data.remote.dto.UpdateProfileRequest
 import com.example.vacancyapp.domain.repository.AuthRepository
@@ -26,8 +28,9 @@ data class ProfileUiState(
 class ProfileViewModel @Inject constructor(
     private val tokenManager: TokenManager,
     private val authRepository: AuthRepository,
-    private val apiService: ApiService
-) : ViewModel() {
+    private val apiService: ApiService,
+    application: Application
+) : AndroidViewModel(application) {
 
     private val _uiState = MutableStateFlow(ProfileUiState())
     val uiState = _uiState.asStateFlow()
@@ -53,14 +56,13 @@ class ProfileViewModel @Inject constructor(
                     )
                 }
             } catch (_: Exception) {
-
                 _uiState.update {
                     it.copy(
                         email = email,
                         role = role,
                         isLoading = false,
                         isOffline = true,
-                        error = "Нет соединения. Показаны сохранённые данные"
+                        error = getApplication<Application>().getString(R.string.profile_offline_message)
                     )
                 }
             }
@@ -77,7 +79,6 @@ class ProfileViewModel @Inject constructor(
 
         try {
             val token = tokenManager.token.first() ?: return@launch
-
             apiService.updateProfile(
                 token = token,
                 request = UpdateProfileRequest(
@@ -85,7 +86,6 @@ class ProfileViewModel @Inject constructor(
                     lastName = currentLastName.ifBlank { null }
                 )
             )
-
             _uiState.update {
                 it.copy(
                     firstName = currentFirstName,
@@ -95,9 +95,15 @@ class ProfileViewModel @Inject constructor(
                     error = null
                 )
             }
-
         } catch (e: Exception) {
-            _uiState.update { it.copy(error = "Ошибка сохранения: ${e.message}", isLoading = false) }
+            _uiState.update {
+                it.copy(
+                    error = getApplication<Application>().getString(
+                        R.string.profile_error_save, e.message ?: ""
+                    ),
+                    isLoading = false
+                )
+            }
         }
     }
 

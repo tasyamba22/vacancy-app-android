@@ -9,9 +9,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.vacancyapp.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -26,8 +27,10 @@ fun ResumeScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Моё резюме") },
-                navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.Default.ArrowBack, null) } }
+                title = { Text(stringResource(R.string.resume_title)) },
+                navigationIcon = {
+                    IconButton(onClick = onBack) { Icon(Icons.Default.ArrowBack, null) }
+                }
             )
         }
     ) { padding ->
@@ -45,35 +48,31 @@ fun ResumeScreen(
                     OutlinedTextField(
                         value = uiState.fullName,
                         onValueChange = viewModel::onFullNameChange,
-                        label = { Text("ФИО *") },
+                        label = { Text(stringResource(R.string.resume_field_full_name)) },
                         modifier = Modifier.fillMaxWidth()
                     )
-
                     OutlinedTextField(
                         value = uiState.phone,
                         onValueChange = viewModel::onPhoneChange,
-                        label = { Text("Телефон") },
+                        label = { Text(stringResource(R.string.resume_field_phone)) },
                         modifier = Modifier.fillMaxWidth()
                     )
-
                     OutlinedTextField(
                         value = uiState.skills,
                         onValueChange = viewModel::onSkillsChange,
-                        label = { Text("Навыки") },
+                        label = { Text(stringResource(R.string.resume_field_skills)) },
                         modifier = Modifier.fillMaxWidth().height(120.dp)
                     )
-
                     OutlinedTextField(
                         value = uiState.experience,
                         onValueChange = viewModel::onExperienceChange,
-                        label = { Text("Опыт работы") },
+                        label = { Text(stringResource(R.string.resume_field_experience)) },
                         modifier = Modifier.fillMaxWidth().height(120.dp)
                     )
-
                     OutlinedTextField(
                         value = uiState.education,
                         onValueChange = viewModel::onEducationChange,
-                        label = { Text("Образование") },
+                        label = { Text(stringResource(R.string.resume_field_education)) },
                         modifier = Modifier.fillMaxWidth().height(120.dp)
                     )
 
@@ -86,16 +85,21 @@ fun ResumeScreen(
                         modifier = Modifier.fillMaxWidth(),
                         enabled = !uiState.isLoading
                     ) {
-                        Text(if (uiState.resume == null) "Создать резюме" else "Сохранить изменения")
+                        Text(
+                            if (uiState.resume == null) stringResource(R.string.resume_button_create)
+                            else stringResource(R.string.resume_button_save)
+                        )
                     }
 
                     if (uiState.resume != null) {
                         OutlinedButton(
                             onClick = viewModel::delete,
                             modifier = Modifier.fillMaxWidth(),
-                            colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error)
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                contentColor = MaterialTheme.colorScheme.error
+                            )
                         ) {
-                            Text("Удалить резюме")
+                            Text(stringResource(R.string.resume_button_delete))
                         }
                     }
                 }

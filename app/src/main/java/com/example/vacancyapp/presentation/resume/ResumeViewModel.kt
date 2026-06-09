@@ -1,7 +1,9 @@
 package com.example.vacancyapp.presentation.resume
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.vacancyapp.R
 import com.example.vacancyapp.domain.models.Resume
 import com.example.vacancyapp.domain.repository.ResumeRepository
 import com.example.vacancyapp.utils.TokenManager
@@ -25,8 +27,10 @@ data class ResumeUiState(
 @HiltViewModel
 class ResumeViewModel @Inject constructor(
     private val resumeRepository: ResumeRepository,
-    private val tokenManager: TokenManager
-) : ViewModel() {
+    private val tokenManager: TokenManager,
+    application: Application
+) : AndroidViewModel(application) {
+
     private val _uiState = MutableStateFlow(ResumeUiState())
     val uiState = _uiState.asStateFlow()
 
@@ -37,7 +41,17 @@ class ResumeViewModel @Inject constructor(
         try {
             val token = tokenManager.token.first() ?: return@launch
             val resume = resumeRepository.getMyResume(token)
-            _uiState.update { it.copy(resume = resume, isLoading = false, fullName = resume.fullName, phone = resume.phone ?: "", skills = resume.skills ?: "", experience = resume.experience ?: "", education = resume.education ?: "") }
+            _uiState.update {
+                it.copy(
+                    resume = resume,
+                    isLoading = false,
+                    fullName = resume.fullName,
+                    phone = resume.phone ?: "",
+                    skills = resume.skills ?: "",
+                    experience = resume.experience ?: "",
+                    education = resume.education ?: ""
+                )
+            }
         } catch (_: Exception) {
             _uiState.update { it.copy(isLoading = false, resume = null, error = null) }
         }
@@ -51,14 +65,27 @@ class ResumeViewModel @Inject constructor(
 
     fun save() = viewModelScope.launch {
         val state = _uiState.value
-        if (state.fullName.isBlank()) { _uiState.update { it.copy(error = "ФИО обязательно") }; return@launch }
+        if (state.fullName.isBlank()) {
+            _uiState.update {
+                it.copy(error = getApplication<Application>().getString(R.string.resume_error_full_name_required))
+            }
+            return@launch
+        }
         _uiState.update { it.copy(isLoading = true) }
         try {
             val token = tokenManager.token.first() ?: return@launch
             if (state.resume == null) {
-                resumeRepository.createResume(token, state.fullName, state.phone.ifBlank { null }, state.skills.ifBlank { null }, state.experience.ifBlank { null }, state.education.ifBlank { null })
+                resumeRepository.createResume(
+                    token, state.fullName,
+                    state.phone.ifBlank { null }, state.skills.ifBlank { null },
+                    state.experience.ifBlank { null }, state.education.ifBlank { null }
+                )
             } else {
-                resumeRepository.updateResume(token, state.fullName, state.phone.ifBlank { null }, state.skills.ifBlank { null }, state.experience.ifBlank { null }, state.education.ifBlank { null })
+                resumeRepository.updateResume(
+                    token, state.fullName,
+                    state.phone.ifBlank { null }, state.skills.ifBlank { null },
+                    state.experience.ifBlank { null }, state.education.ifBlank { null }
+                )
             }
             _uiState.update { it.copy(isSaved = true) }
         } catch (e: Exception) {

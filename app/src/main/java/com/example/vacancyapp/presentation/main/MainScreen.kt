@@ -12,9 +12,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.vacancyapp.R
 import com.example.vacancyapp.domain.models.Vacancy
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalFocusManager
@@ -56,10 +58,13 @@ fun MainScreen(
         topBar = {
             Column {
                 TopAppBar(
-                    title = { Text(if (isMyTab) "Мои вакансии" else "Вакансии") },
+                    title = {
+                        Text(if (isMyTab) stringResource(R.string.main_title_my_vacancies)
+                        else stringResource(R.string.main_title_vacancies))
+                    },
                     actions = {
                         IconButton(onClick = onNavigateToProfile) {
-                            Icon(Icons.Default.AccountCircle, "Профиль")
+                            Icon(Icons.Default.AccountCircle, stringResource(R.string.main_profile_cd))
                         }
                     }
                 )
@@ -84,7 +89,7 @@ fun MainScreen(
         floatingActionButton = {
             if (!isMyTab) {
                 FloatingActionButton(onClick = onAddVacancy) {
-                    Icon(Icons.Default.Add, "Добавить")
+                    Icon(Icons.Default.Add, stringResource(R.string.main_add_cd))
                 }
             }
         },
@@ -94,26 +99,26 @@ fun MainScreen(
                     selected = !isMyTab,
                     onClick = onNavigateToAll,
                     icon = { Icon(Icons.Default.Work, contentDescription = null) },
-                    label = { Text("Все", style = MaterialTheme.typography.labelSmall) }
+                    label = { Text(stringResource(R.string.main_tab_all), style = MaterialTheme.typography.labelSmall) }
                 )
                 NavigationBarItem(
                     selected = false,
                     onClick = onNavigateToFavorites,
                     icon = { Icon(Icons.Default.Favorite, contentDescription = null) },
-                    label = { Text("Избранное", style = MaterialTheme.typography.labelSmall) }
+                    label = { Text(stringResource(R.string.main_tab_favorites), style = MaterialTheme.typography.labelSmall) }
                 )
                 NavigationBarItem(
                     selected = isMyTab,
                     onClick = onNavigateToMyVacancies,
                     icon = { Icon(Icons.Default.Person, contentDescription = null) },
-                    label = { Text("Мои", style = MaterialTheme.typography.labelSmall) }
+                    label = { Text(stringResource(R.string.main_tab_my), style = MaterialTheme.typography.labelSmall) }
                 )
                 if (role != "ADMIN") {
                     NavigationBarItem(
                         selected = false,
                         onClick = onNavigateToResume,
                         icon = { Icon(Icons.Default.Description, contentDescription = null) },
-                        label = { Text("Резюме", style = MaterialTheme.typography.labelSmall) }
+                        label = { Text(stringResource(R.string.main_tab_resume), style = MaterialTheme.typography.labelSmall) }
                     )
                 }
                 if (role != "ADMIN") {
@@ -121,7 +126,7 @@ fun MainScreen(
                         selected = false,
                         onClick = onNavigateToResponses,
                         icon = { Icon(Icons.Default.Send, contentDescription = null) },
-                        label = { Text("Отклики", style = MaterialTheme.typography.labelSmall) }
+                        label = { Text(stringResource(R.string.main_tab_responses), style = MaterialTheme.typography.labelSmall) }
                     )
                 }
                 if (role == "ADMIN") {
@@ -129,7 +134,7 @@ fun MainScreen(
                         selected = false,
                         onClick = onNavigateToAdmin,
                         icon = { Icon(Icons.Default.AdminPanelSettings, contentDescription = null) },
-                        label = { Text("Админ", style = MaterialTheme.typography.labelSmall) }
+                        label = { Text(stringResource(R.string.main_tab_admin), style = MaterialTheme.typography.labelSmall) }
                     )
                 }
             }
@@ -140,13 +145,15 @@ fun MainScreen(
                 uiState.isLoading -> CircularProgressIndicator(Modifier.align(Alignment.Center))
                 uiState.error != null -> {
                     Column(Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text("Ошибка загрузки", color = MaterialTheme.colorScheme.error)
-                        Button(onClick = viewModel::refresh) { Text("Обновить") }
+                        Text(stringResource(R.string.main_error_load), color = MaterialTheme.colorScheme.error)
+                        Button(onClick = viewModel::refresh) {
+                            Text(stringResource(R.string.main_refresh))
+                        }
                     }
                 }
                 displayVacancies.isEmpty() -> {
                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text("Ничего не найдено")
+                        Text(stringResource(R.string.main_empty))
                     }
                 }
                 else -> LazyColumn(
@@ -222,7 +229,10 @@ fun VacancyCard(
             IconButton(onClick = onFavoriteClick) {
                 Icon(
                     if (vacancy.isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                    contentDescription = null,
+                    contentDescription = if (vacancy.isFavorite)
+                        stringResource(R.string.vacancy_card_unfavorite_cd)
+                    else
+                        stringResource(R.string.vacancy_card_favorite_cd),
                     tint = if (vacancy.isFavorite) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
@@ -252,12 +262,12 @@ fun SearchAndFilterBar(
         OutlinedTextField(
             value = filterState.query,
             onValueChange = onQueryChange,
-            placeholder = { Text("Поиск вакансий...") },
+            placeholder = { Text(stringResource(R.string.search_placeholder)) },
             modifier = Modifier
                 .fillMaxWidth()
                 .onFocusChanged { focusState ->
                     if (focusState.isFocused && filterState.query.isBlank()) {
-                        onQueryChange("") // принудительно показываем историю
+                        onQueryChange("")
                     }
                 },
             singleLine = true,
@@ -269,17 +279,16 @@ fun SearchAndFilterBar(
                         onHideHistory()
                         focusManager.clearFocus()
                     }) {
-                        Icon(Icons.Default.Clear, "Очистить")
+                        Icon(Icons.Default.Clear, stringResource(R.string.search_clear))
                     }
                 } else {
                     IconButton(onClick = { showFilters = !showFilters }) {
-                        Icon(Icons.Default.FilterList, "Фильтры")
+                        Icon(Icons.Default.FilterList, stringResource(R.string.search_filters))
                     }
                 }
             }
         )
 
-        // История поиска
         AnimatedVisibility(visible = showHistory && searchHistory.isNotEmpty() && filterState.query.isBlank()) {
             Card(
                 modifier = Modifier
@@ -294,9 +303,9 @@ fun SearchAndFilterBar(
                             .padding(horizontal = 12.dp, vertical = 8.dp),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text("История поиска", style = MaterialTheme.typography.titleSmall)
+                        Text(stringResource(R.string.search_history_title), style = MaterialTheme.typography.titleSmall)
                         TextButton(onClick = onClearHistory) {
-                            Text("Очистить")
+                            Text(stringResource(R.string.search_history_clear))
                         }
                     }
                     HorizontalDivider()
@@ -315,13 +324,12 @@ fun SearchAndFilterBar(
             }
         }
 
-        // Панель фильтров
         if (showFilters) {
             Spacer(Modifier.height(8.dp))
             OutlinedTextField(
                 value = filterState.city,
                 onValueChange = onCityChange,
-                placeholder = { Text("Город") },
+                placeholder = { Text(stringResource(R.string.filter_city_hint)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 leadingIcon = { Icon(Icons.Default.LocationOn, null) }
@@ -330,7 +338,7 @@ fun SearchAndFilterBar(
             OutlinedTextField(
                 value = filterState.company,
                 onValueChange = onCompanyChange,
-                placeholder = { Text("Компания") },
+                placeholder = { Text(stringResource(R.string.filter_company_hint)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true
             )
@@ -339,7 +347,7 @@ fun SearchAndFilterBar(
                 OutlinedTextField(
                     value = filterState.salaryFrom,
                     onValueChange = onSalaryFromChange,
-                    placeholder = { Text("Зарплата от") },
+                    placeholder = { Text(stringResource(R.string.filter_salary_from)) },
                     modifier = Modifier.weight(1f),
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
@@ -347,7 +355,7 @@ fun SearchAndFilterBar(
                 OutlinedTextField(
                     value = filterState.salaryTo,
                     onValueChange = onSalaryToChange,
-                    placeholder = { Text("до") },
+                    placeholder = { Text(stringResource(R.string.filter_salary_to)) },
                     modifier = Modifier.weight(1f),
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
@@ -358,7 +366,7 @@ fun SearchAndFilterBar(
                 onClick = { onApply(); showFilters = false },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Применить фильтры")
+                Text(stringResource(R.string.filter_apply))
             }
         }
     }

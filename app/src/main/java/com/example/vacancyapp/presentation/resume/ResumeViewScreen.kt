@@ -7,10 +7,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.vacancyapp.R
 import com.example.vacancyapp.domain.models.Resume
 import com.example.vacancyapp.domain.repository.ResumeRepository
 import com.example.vacancyapp.utils.TokenManager
@@ -53,19 +55,47 @@ fun ResumeViewScreen(userId: Int, onBack: () -> Unit, viewModel: ResumeViewViewM
     LaunchedEffect(userId) { viewModel.load(userId) }
 
     Scaffold(topBar = {
-        TopAppBar(title = { Text("Резюме соискателя") }, navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.Default.ArrowBack, null) } })
+        TopAppBar(
+            title = { Text(stringResource(R.string.resume_view_title)) },
+            navigationIcon = {
+                IconButton(onClick = onBack) {
+                    Icon(Icons.Default.ArrowBack, stringResource(R.string.resume_view_cd_back))
+                }
+            }
+        )
     }) { padding ->
         Box(Modifier.fillMaxSize().padding(padding)) {
             when {
                 isLoading -> CircularProgressIndicator(Modifier.align(Alignment.Center))
-                resume == null -> Text("Резюме не найдено", Modifier.align(Alignment.Center))
+                resume == null -> Text(stringResource(R.string.resume_view_not_found), Modifier.align(Alignment.Center))
                 else -> Column(Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     resume!!.let { r ->
                         Text(r.fullName, style = MaterialTheme.typography.headlineMedium)
                         r.phone?.let { Text(" $it") }
-                        r.skills?.let { Card(Modifier.fillMaxWidth()) { Column(Modifier.padding(12.dp)) { Text("Навыки", style = MaterialTheme.typography.titleSmall); Text(it) } } }
-                        r.experience?.let { Card(Modifier.fillMaxWidth()) { Column(Modifier.padding(12.dp)) { Text("Опыт работы", style = MaterialTheme.typography.titleSmall); Text(it) } } }
-                        r.education?.let { Card(Modifier.fillMaxWidth()) { Column(Modifier.padding(12.dp)) { Text("Образование", style = MaterialTheme.typography.titleSmall); Text(it) } } }
+                        r.skills?.let {
+                            Card(Modifier.fillMaxWidth()) {
+                                Column(Modifier.padding(12.dp)) {
+                                    Text(stringResource(R.string.resume_view_section_skills), style = MaterialTheme.typography.titleSmall)
+                                    Text(it)
+                                }
+                            }
+                        }
+                        r.experience?.let {
+                            Card(Modifier.fillMaxWidth()) {
+                                Column(Modifier.padding(12.dp)) {
+                                    Text(stringResource(R.string.resume_view_section_experience), style = MaterialTheme.typography.titleSmall)
+                                    Text(it)
+                                }
+                            }
+                        }
+                        r.education?.let {
+                            Card(Modifier.fillMaxWidth()) {
+                                Column(Modifier.padding(12.dp)) {
+                                    Text(stringResource(R.string.resume_view_section_education), style = MaterialTheme.typography.titleSmall)
+                                    Text(it)
+                                }
+                            }
+                        }
                     }
                 }
             }

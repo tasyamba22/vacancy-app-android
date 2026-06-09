@@ -12,10 +12,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.vacancyapp.R
 import com.example.vacancyapp.domain.models.VacancyResponse
 import com.example.vacancyapp.domain.repository.ResponseRepository
 import com.example.vacancyapp.utils.ResponseStatus
@@ -25,11 +27,14 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+
+
 @HiltViewModel
 class MyResponsesViewModel @Inject constructor(
     private val responseRepository: ResponseRepository,
     private val tokenManager: TokenManager
 ) : androidx.lifecycle.ViewModel() {
+
     private val _responses = MutableStateFlow<List<VacancyResponse>>(emptyList())
     private val _isLoading = MutableStateFlow(true)
     val responses = _responses.asStateFlow()
@@ -53,9 +58,7 @@ class MyResponsesViewModel @Inject constructor(
             _responses.update { it.filter { r -> r.id != id } }
         } catch (_: Exception) {}
     }
-
 }
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyResponsesScreen(
@@ -68,10 +71,10 @@ fun MyResponsesScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Мои отклики") },
+                title = { Text(stringResource(R.string.my_responses_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, "Назад")
+                        Icon(Icons.Default.ArrowBack, stringResource(R.string.common_back))
                     }
                 }
             )
@@ -80,33 +83,25 @@ fun MyResponsesScreen(
         Box(Modifier.fillMaxSize().padding(padding)) {
             when {
                 isLoading -> CircularProgressIndicator(Modifier.align(Alignment.Center))
-                responses.isEmpty() -> {
-                    Column(
-                        modifier = Modifier.align(Alignment.Center),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Icon(
-                            Icons.Default.Send,
-                            contentDescription = null,
-                            modifier = Modifier.size(80.dp),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
-                        )
-                        Spacer(Modifier.height(16.dp))
-                        Text("Пока нет откликов", style = MaterialTheme.typography.titleLarge)
-                        Text("Ваши отклики на вакансии будут здесь", style = MaterialTheme.typography.bodyMedium)
-                    }
+                responses.isEmpty() -> Column(
+                    modifier = Modifier.align(Alignment.Center),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Icon(
+                        Icons.Default.Send, null,
+                        modifier = Modifier.size(80.dp),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                    )
+                    Spacer(Modifier.height(16.dp))
+                    Text(stringResource(R.string.my_responses_empty_title), style = MaterialTheme.typography.titleLarge)
+                    Text(stringResource(R.string.my_responses_empty_subtitle), style = MaterialTheme.typography.bodyMedium)
                 }
-                else -> {
-                    LazyColumn(
-                        contentPadding = PaddingValues(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        items(responses, key = { it.id }) { response ->
-                            ResponseCard(
-                                response = response,
-                                onWithdraw = { viewModel.withdraw(response.id) }
-                            )
-                        }
+                else -> LazyColumn(
+                    contentPadding = PaddingValues(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(responses, key = { it.id }) { response ->
+                        ResponseCard(response = response, onWithdraw = { viewModel.withdraw(response.id) })
                     }
                 }
             }
@@ -115,25 +110,18 @@ fun MyResponsesScreen(
 }
 
 @Composable
-fun ResponseCard(
-    response: VacancyResponse,
-    onWithdraw: () -> Unit
-) {
+fun ResponseCard(response: VacancyResponse, onWithdraw: () -> Unit) {
     val statusColor = when (response.status) {
         ResponseStatus.ACCEPTED -> MaterialTheme.colorScheme.primary
         ResponseStatus.REJECTED -> MaterialTheme.colorScheme.error
         else -> MaterialTheme.colorScheme.secondary
     }
-
     Card(modifier = Modifier.fillMaxWidth()) {
         Column(Modifier.padding(16.dp)) {
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth()
-            ) {
+            Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
                 Column(Modifier.weight(1f)) {
                     Text(
-                        response.vacancyTitle ?: "Вакансия #${response.vacancyId}",
+                        response.vacancyTitle ?: stringResource(R.string.my_responses_vacancy_fallback, response.vacancyId),
                         style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold)
                     )
                     response.companyName?.let {
@@ -144,22 +132,19 @@ fun ResponseCard(
                     Icon(Icons.Default.Delete, null, tint = MaterialTheme.colorScheme.error)
                 }
             }
-
             Spacer(Modifier.height(8.dp))
-
             Text(
                 text = when (response.status) {
-                    ResponseStatus.ACCEPTED -> "Принят"
-                    ResponseStatus.REJECTED -> "Отклонён"
-                    else -> "На рассмотрении"
+                    ResponseStatus.ACCEPTED -> stringResource(R.string.my_responses_status_accepted)
+                    ResponseStatus.REJECTED -> stringResource(R.string.my_responses_status_rejected)
+                    else -> stringResource(R.string.my_responses_status_pending)
                 },
                 color = statusColor,
                 style = MaterialTheme.typography.titleSmall
             )
-
             response.coverLetter?.let {
                 Spacer(Modifier.height(8.dp))
-                Text("Сопроводительное письмо:", style = MaterialTheme.typography.labelMedium)
+                Text(stringResource(R.string.my_responses_cover_letter_label), style = MaterialTheme.typography.labelMedium)
                 Text(it, style = MaterialTheme.typography.bodyMedium)
             }
         }

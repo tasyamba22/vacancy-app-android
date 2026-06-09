@@ -1,7 +1,9 @@
 package com.example.vacancyapp.presentation.auth
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.vacancyapp.R
 import com.example.vacancyapp.domain.repository.AuthRepository
 import com.example.vacancyapp.utils.TokenManager
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,8 +22,9 @@ data class AuthUiState(
 @HiltViewModel
 class AuthViewModel @Inject constructor(
     private val authRepository: AuthRepository,
-    private val tokenManager: TokenManager
-) : ViewModel() {
+    private val tokenManager: TokenManager,
+    application: Application
+) : AndroidViewModel(application) {
 
     private val _uiState = MutableStateFlow(AuthUiState())
     val uiState = _uiState.asStateFlow()
@@ -40,14 +43,17 @@ class AuthViewModel @Inject constructor(
                 )
                 _uiState.value = AuthUiState(isSuccess = true)
             } catch (e: ClientRequestException) {
+                val ctx = getApplication<Application>()
                 val errorMessage = when (e.response.status.value) {
-                    401 -> "Неверный email или пароль"
-                    403 -> "Ваш аккаунт заблокирован"
-                    else -> "Ошибка входа"
+                    401 -> ctx.getString(R.string.login_error_wrong_credentials)
+                    403 -> ctx.getString(R.string.login_error_blocked)
+                    else -> ctx.getString(R.string.login_error_generic)
                 }
                 _uiState.value = AuthUiState(error = errorMessage)
             } catch (e: Exception) {
-                _uiState.value = AuthUiState(error = "Неверный email или пароль")
+                _uiState.value = AuthUiState(
+                    error = getApplication<Application>().getString(R.string.login_error_wrong_credentials)
+                )
             }
         }
     }
@@ -66,14 +72,17 @@ class AuthViewModel @Inject constructor(
                 )
                 _uiState.value = AuthUiState(isSuccess = true)
             } catch (e: ClientRequestException) {
+                val ctx = getApplication<Application>()
                 val errorMessage = when (e.response.status.value) {
-                    409 -> "Пользователь с таким email уже существует"
-                    400 -> "Пароль должен быть не менее 6 символов"
-                    else -> "Ошибка регистрации"
+                    409 -> ctx.getString(R.string.register_error_email_exists)
+                    400 -> ctx.getString(R.string.register_error_password_short)
+                    else -> ctx.getString(R.string.register_error_generic)
                 }
                 _uiState.value = AuthUiState(error = errorMessage)
             } catch (e: Exception) {
-                _uiState.value = AuthUiState(error = "Ошибка регистрации")
+                _uiState.value = AuthUiState(
+                    error = getApplication<Application>().getString(R.string.register_error_generic)
+                )
             }
         }
     }
